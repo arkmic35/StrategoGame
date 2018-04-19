@@ -1,9 +1,11 @@
 package settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.arkmic35.stratego.R
+import game.GameActivity
 
 class PreferencesActivity : AppCompatActivity() {
 
@@ -13,6 +15,6 @@ class PreferencesActivity : AppCompatActivity() {
     }
 
     fun startGame(view: View) {
-
+        startActivity(Intent(this, GameActivity::class.java))
     }
 }
