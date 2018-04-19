@@ -4,13 +4,17 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 
 class TileView : View {
     private val paint: Paint = Paint()
-    var startPosition: Pair<Float, Float>? = null
-    var endPosition: Pair<Float, Float>? = null
+    var rectangle: RectF? = null
+
+    constructor(context: Context?, x: Float, y: Float, width: Float, height: Float) : super(context) {
+        this.rectangle = RectF(x, y, x + width, y + height)
+    }
 
     constructor(context: Context) : super(context)
 
@@ -22,9 +26,9 @@ class TileView : View {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun onDraw(canvas: Canvas) {
-        if (startPosition != null && endPosition != null) {
+        if (rectangle != null) {
             paint.color = Color.GRAY
-            canvas.drawRect(startPosition!!.first, startPosition!!.second, endPosition!!.first, endPosition!!.second, paint)
+            canvas.drawRect(rectangle, paint)
         }
     }
 }
