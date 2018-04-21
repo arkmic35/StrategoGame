@@ -1,19 +1,38 @@
 package game
 
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.support.v7.widget.GridLayout
 import android.util.AttributeSet
 import android.view.View
+import java.util.*
 
-class TileView : View {
-    private val paint: Paint = Paint()
-    var rectangle: RectF? = null
+class TileView : View, Observer {
+    var field: Field? = null
+    private var tileWidth: Int = 0
+    private var tileHeight: Int = 0
+    private var margin: Int = 0
+    var rowIndex = -1
+    var columnIndex = -1
 
-    constructor(context: Context?, x: Float, y: Float, width: Float, height: Float) : super(context) {
-        this.rectangle = RectF(x, y, x + width, y + height)
+    constructor(context: Context?, width: Int, height: Int, margin: Int, rowIndex: Int, columnIndex: Int) : super(context) {
+        this.tileWidth = width
+        this.tileHeight = height
+        this.margin = margin
+        this.rowIndex = rowIndex
+        this.columnIndex = columnIndex
+        setBackgroundColor(Color.GRAY)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        val params = this.layoutParams
+        params as GridLayout.LayoutParams
+        params.width = tileWidth
+        params.height = tileHeight
+        params.marginEnd = margin
+        params.bottomMargin = margin
     }
 
     constructor(context: Context) : super(context)
@@ -25,10 +44,7 @@ class TileView : View {
     @Suppress("unused")
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    override fun onDraw(canvas: Canvas) {
-        if (rectangle != null) {
-            paint.color = Color.GRAY
-            canvas.drawRect(rectangle, paint)
-        }
+    override fun update(o: Observable?, arg: Any?) {
+        setBackgroundColor(field!!.player!!.color)
     }
 }

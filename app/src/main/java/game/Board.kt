@@ -4,16 +4,18 @@ import java.security.InvalidAlgorithmParameterException
 
 class Board(val size: Int) {
     private val lastIndex = size - 1
-    private val fields = Array(size, { Array<Player?>(size, { null }) })
+    val fields = Array(size, { Array(size, { Field() }) })
+    var freeSpots = size * size
 
     fun markField(player: Player, rowIndex: Int, columnIndex: Int) {
         var pointsToAdd = 0
 
-        if (fields[rowIndex][columnIndex] != null) {
+        if (fields[rowIndex][columnIndex].player != null) {
             throw InvalidAlgorithmParameterException()
         }
 
-        fields[rowIndex][columnIndex] = player
+        fields[rowIndex][columnIndex].player = player
+        freeSpots--
 
         if (isSidePosition(rowIndex, columnIndex)) {
             if (isColumnFull(columnIndex)) {
@@ -29,6 +31,10 @@ class Board(val size: Int) {
         }
     }
 
+    fun isFieldFree(rowIndex: Int, columnIndex: Int): Boolean {
+        return fields[rowIndex][columnIndex].player == null
+    }
+
     private fun isFieldPositionCorrect(rowIndex: Int, columnIndex: Int): Boolean {
         return rowIndex in 0..lastIndex && columnIndex in 0..lastIndex
     }
@@ -39,7 +45,7 @@ class Board(val size: Int) {
 
     private fun isColumnFull(columnIndex: Int): Boolean {
         for (rowIndex in 0..lastIndex) {
-            if (fields[rowIndex][columnIndex] == null) {
+            if (isFieldFree(rowIndex, columnIndex)) {
                 return false
             }
         }
@@ -48,7 +54,7 @@ class Board(val size: Int) {
 
     private fun isRowFull(rowIndex: Int): Boolean {
         for (columnIndex in 0..lastIndex) {
-            if (fields[rowIndex][columnIndex] == null) {
+            if (isFieldFree(rowIndex, columnIndex)) {
                 return false
             }
         }
@@ -60,25 +66,25 @@ class Board(val size: Int) {
         var checkRow = rowIndex + 1
         var checkColumn = columnIndex + 1
 
-        while (isFieldPositionCorrect(++checkRow, ++checkColumn) && fields[checkRow][checkColumn] != null) {
+        while (isFieldPositionCorrect(++checkRow, ++checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
             if (isSidePosition(checkRow, checkColumn)) {
                 pointsToAdd += Math.abs(checkRow - rowIndex)
             }
         }
 
-        while (isFieldPositionCorrect(++checkRow, --checkColumn) && fields[checkRow][checkColumn] != null) {
+        while (isFieldPositionCorrect(++checkRow, --checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
             if (isSidePosition(checkRow, checkColumn)) {
                 pointsToAdd += Math.abs(checkRow - rowIndex)
             }
         }
 
-        while (isFieldPositionCorrect(--checkRow, ++checkColumn) && fields[checkRow][checkColumn] != null) {
+        while (isFieldPositionCorrect(--checkRow, ++checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
             if (isSidePosition(checkRow, checkColumn)) {
                 pointsToAdd += Math.abs(checkRow - rowIndex)
             }
         }
 
-        while (isFieldPositionCorrect(--checkRow, --checkColumn) && fields[checkRow][checkColumn] != null) {
+        while (isFieldPositionCorrect(--checkRow, --checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
             if (isSidePosition(checkRow, checkColumn)) {
                 pointsToAdd += Math.abs(checkRow - rowIndex)
             }
