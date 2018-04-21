@@ -1,11 +1,13 @@
 package game
 
-import android.graphics.Color
+import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayout
 import android.widget.TextView
 import com.arkmic35.stratego.R
+import com.arkmic35.stratego.databinding.ActivityGameBinding
 import java.util.*
 
 
@@ -29,7 +31,8 @@ class GameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_game)
+        val binding = DataBindingUtil.setContentView<ActivityGameBinding>(this, R.layout.activity_game)
+
         tableFrame = findViewById(R.id.tableFrame)
 
         val extras = intent.extras
@@ -44,6 +47,8 @@ class GameActivity : AppCompatActivity() {
         }
 
         createPlayers()
+        binding.player1 = players!![0]
+        binding.player2 = players!![1]
     }
 
     private fun drawTiles() {
@@ -82,17 +87,19 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun createPlayers() {
+        val colors = intArrayOf(ContextCompat.getColor(this, R.color.colorTileRed), ContextCompat.getColor(this, R.color.colorTileBlack))
+
         when (gameMode) {
             GameMode.PLAYER_VS_PHONE -> {
-                players = arrayOf(Player("Gracz", Player.PlayerType.PLAYER_HUMAN, Color.RED), Player("Telefon", Player.PlayerType.PLAYER_CPU, Color.BLACK))
+                players = arrayOf(Player("Gracz", Player.PlayerType.PLAYER_HUMAN, colors[0]), Player("Telefon", Player.PlayerType.PLAYER_CPU, colors[1]))
             }
 
             GameMode.PLAYER_VS_PLAYER -> {
-                players = arrayOf(Player("Gracz 1", Player.PlayerType.PLAYER_HUMAN, Color.RED), Player("Gracz 2", Player.PlayerType.PLAYER_HUMAN, Color.BLACK))
+                players = arrayOf(Player("Gracz 1", Player.PlayerType.PLAYER_HUMAN, colors[0]), Player("Gracz 2", Player.PlayerType.PLAYER_HUMAN, colors[1]))
             }
 
             GameMode.PHONE_VS_PHONE -> {
-                players = arrayOf(Player("Telefon 1", Player.PlayerType.PLAYER_CPU, Color.RED), Player("Telefon 2", Player.PlayerType.PLAYER_CPU, Color.BLACK))
+                players = arrayOf(Player("Telefon 1", Player.PlayerType.PLAYER_CPU, colors[0]), Player("Telefon 2", Player.PlayerType.PLAYER_CPU, colors[1]))
             }
         }
 

@@ -2,5 +2,5 @@
 <resources>
     <dimen name="tiles_tile_width" format="integer">48dp</dimen>
     <dimen name="tiles_tile_height" format="integer">48dp</dimen>
-    <dimen name="tiles_space_between" format="integer">8dp</dimen>
+    <dimen name="tiles_space_between" format="integer">4dp</dimen>
 </resources>

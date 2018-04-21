@@ -1,10 +1,11 @@
 package game
 
 import android.content.Context
-import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayout
 import android.util.AttributeSet
 import android.view.View
+import com.arkmic35.stratego.R
 import java.util.*
 
 class TileView : View, Observer {
@@ -15,13 +16,13 @@ class TileView : View, Observer {
     var rowIndex = -1
     var columnIndex = -1
 
-    constructor(context: Context?, width: Int, height: Int, margin: Int, rowIndex: Int, columnIndex: Int) : super(context) {
+    constructor(context: Context, width: Int, height: Int, margin: Int, rowIndex: Int, columnIndex: Int) : super(context) {
         this.tileWidth = width
         this.tileHeight = height
         this.margin = margin
         this.rowIndex = rowIndex
         this.columnIndex = columnIndex
-        setBackgroundColor(Color.GRAY)
+        setBackgroundColor(ContextCompat.getColor(context, R.color.colorTileGrey))
     }
 
     override fun onAttachedToWindow() {

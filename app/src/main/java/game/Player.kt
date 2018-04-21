@@ -1,17 +1,29 @@
 package game
 
+import android.databinding.BaseObservable
+import android.databinding.Bindable
+import com.arkmic35.stratego.BR
 import java.util.*
 
-class Player(private val playerName: String, val playerType: PlayerType, val color: Int) {
+class Player(val playerName: String, val playerType: PlayerType, val color: Int) : BaseObservable() {
     enum class PlayerType {
         PLAYER_HUMAN,
         PLAYER_CPU
     }
 
-    private var points: Int = 0
+    @Suppress("MemberVisibilityCanBePrivate")
+    @Bindable
+    var points: Int = 0
+
+    @Bindable
+    fun getPointsString(): String {
+        return "$points pkt."
+    }
 
     fun addPoints(pointsToAdd: Int) {
         points += pointsToAdd
+        notifyPropertyChanged(BR.points)
+        notifyPropertyChanged(BR.pointsString)
     }
 
     fun makeRandomMovement(board: Board) {
