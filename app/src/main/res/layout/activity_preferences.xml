@@ -16,8 +16,10 @@
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@+id/txtTableSize"
@@ -35,14 +37,14 @@
                 android:id="@+id/seekTableSize"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginStart="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/txtTableSize"
                 app:rsb_cellMode="number"
-                app:rsb_cells="12"
+                app:rsb_cells="11"
                 app:rsb_max="15"
-                app:rsb_min="3"
+                app:rsb_min="4"
                 app:rsb_progressHintMode="alwaysShow"
                 app:rsb_seekBarMode="single" />
 
@@ -50,9 +52,11 @@
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout2"
-            android:layout_width="381dp"
-            android:layout_height="61dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout1">
 
             <TextView
@@ -71,10 +75,10 @@
                 android:id="@+id/selectGameMode"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:entries="@array/gameModes"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

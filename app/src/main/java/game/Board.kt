@@ -8,8 +8,6 @@ class Board(val size: Int) {
     var freeSpots = size * size
 
     fun markField(player: Player, rowIndex: Int, columnIndex: Int) {
-        var pointsToAdd = 0
-
         if (fields[rowIndex][columnIndex].player != null) {
             throw InvalidAlgorithmParameterException()
         }
@@ -18,16 +16,40 @@ class Board(val size: Int) {
         freeSpots--
 
         if (isSidePosition(rowIndex, columnIndex)) {
+            var pointsToAdd = 0
+            val message = StringBuilder()
+
+            message.append(player.playerName + " otrzymuje:")
+
             if (isColumnFull(columnIndex)) {
                 pointsToAdd += size
+                message.append(String.format("\n+%d pkt za wypełnienie kolumny #%d", size, columnIndex + 1))
             }
 
             if (isRowFull(rowIndex)) {
                 pointsToAdd += size
+                message.append("\n+$size pkt za wypełnienie wiersza #" + (rowIndex + 1))
             }
 
-            pointsToAdd += getPointsFromDiagonals(rowIndex, columnIndex)
-            player.addPoints(pointsToAdd)
+            val farLeftDiagonal = findFarLeftDiagonal(rowIndex, columnIndex)
+            val leftDiagonalPoints = checkFarLeftDiagonal(farLeftDiagonal[0], farLeftDiagonal[1])
+
+            if (leftDiagonalPoints > 1) {
+                pointsToAdd += leftDiagonalPoints
+                message.append(String.format("\n+%d pkt za wypełnienie linii ukośnej od (%d, %d)", leftDiagonalPoints, farLeftDiagonal[0] + 1, farLeftDiagonal[1] + 1))
+            }
+
+            val farRightDiagonal = findFarRightDiagonal(rowIndex, columnIndex)
+            val rightDiagonalPoints = checkFarRightDiagonal(farRightDiagonal[0], farRightDiagonal[1])
+
+            if (rightDiagonalPoints > 1) {
+                pointsToAdd += rightDiagonalPoints
+                message.append(String.format("\n+%d pkt za wypełnienie linii ukośnej od (%d, %d)", rightDiagonalPoints, farRightDiagonal[0] + 1, farRightDiagonal[1] + 1))
+            }
+
+            if (pointsToAdd != 0) {
+                player.addPoints(pointsToAdd, message.toString())
+            }
         }
     }
 
@@ -40,7 +62,7 @@ class Board(val size: Int) {
     }
 
     private fun isSidePosition(rowIndex: Int, columnIndex: Int): Boolean {
-        return rowIndex == 0 || columnIndex == 0 || rowIndex == lastIndex || columnIndex == 0
+        return rowIndex == 0 || columnIndex == lastIndex || rowIndex == lastIndex || columnIndex == 0
     }
 
     private fun isColumnFull(columnIndex: Int): Boolean {
@@ -61,39 +83,75 @@ class Board(val size: Int) {
         return true
     }
 
-    private fun getPointsFromDiagonals(rowIndex: Int, columnIndex: Int): Int {
-        var pointsToAdd = 0
-        var checkRow = rowIndex + 1
-        var checkColumn = columnIndex + 1
+    private fun findFarLeftDiagonal(rowIndex: Int, columnIndex: Int): IntArray {
+        var checkRow = rowIndex
+        var checkColumn = columnIndex
 
-        while (isFieldPositionCorrect(++checkRow, ++checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
-            if (isSidePosition(checkRow, checkColumn)) {
-                pointsToAdd += Math.abs(checkRow - rowIndex)
+        while (checkRow != 0 && checkColumn != 0) {
+            checkRow--
+            checkColumn--
+        }
+
+        return intArrayOf(checkRow, checkColumn)
+    }
+
+    private fun checkFarLeftDiagonal(rowIndex: Int, columnIndex: Int): Int {
+        assert(isSidePosition(rowIndex, columnIndex))
+        var checkRow = rowIndex
+        var checkColumn = columnIndex
+        var length = 0
+
+        while (isFieldPositionCorrect(checkRow, checkColumn)) {
+            if (isFieldFree(checkRow, checkColumn)) {
+                return 0
             }
-        }
 
-        while (isFieldPositionCorrect(++checkRow, --checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
-            if (isSidePosition(checkRow, checkColumn)) {
-                pointsToAdd += Math.abs(checkRow - rowIndex)
+            length++
+
+            if (checkRow == lastIndex || checkColumn == lastIndex) {
+                break
             }
+
+            checkRow++
+            checkColumn++
         }
 
-        while (isFieldPositionCorrect(--checkRow, ++checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
-            if (isSidePosition(checkRow, checkColumn)) {
-                pointsToAdd += Math.abs(checkRow - rowIndex)
+        return length
+    }
+
+    private fun checkFarRightDiagonal(rowIndex: Int, columnIndex: Int): Int {
+        assert(isSidePosition(rowIndex, columnIndex))
+        var checkRow = rowIndex
+        var checkColumn = columnIndex
+        var length = 0
+
+        while (isFieldPositionCorrect(checkRow, checkColumn)) {
+            if (isFieldFree(checkRow, checkColumn)) {
+                return 0
             }
-        }
 
-        while (isFieldPositionCorrect(--checkRow, --checkColumn) && !isFieldFree(rowIndex, columnIndex)) {
-            if (isSidePosition(checkRow, checkColumn)) {
-                pointsToAdd += Math.abs(checkRow - rowIndex)
+            length++
+
+            if (checkRow == lastIndex || checkColumn == 0) {
+                break
             }
+
+            checkRow++
+            checkColumn--
         }
 
-        if (pointsToAdd != 0) {
-            pointsToAdd++
+        return length
+    }
+
+    private fun findFarRightDiagonal(rowIndex: Int, columnIndex: Int): IntArray {
+        var checkRow = rowIndex
+        var checkColumn = columnIndex
+
+        while (checkRow != 0 && checkColumn != lastIndex) {
+            checkRow--
+            checkColumn++
         }
 
-        return pointsToAdd
+        return intArrayOf(checkRow, checkColumn)
     }
 }

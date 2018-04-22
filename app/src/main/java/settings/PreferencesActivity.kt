@@ -16,7 +16,7 @@ class PreferencesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_preferences)
     }
 
-    fun startGame(view: View) {
+    fun startGame(@Suppress("UNUSED_PARAMETER") view: View) {
         val intent = Intent(this, GameActivity::class.java)
         val boardSize = findViewById<RangeSeekBar>(R.id.seekTableSize).currentRange
         val gameMode = findViewById<Spinner>(R.id.selectGameMode).selectedItemPosition

@@ -1,5 +1,6 @@
 package game
 
+import android.arch.lifecycle.MutableLiveData
 import android.databinding.BaseObservable
 import android.databinding.Bindable
 import com.arkmic35.stratego.BR
@@ -11,6 +12,8 @@ class Player(val playerName: String, val playerType: PlayerType, val color: Int)
         PLAYER_CPU
     }
 
+    val messageLiveData = MutableLiveData<String>()
+
     @Suppress("MemberVisibilityCanBePrivate")
     @Bindable
     var points: Int = 0
@@ -20,10 +23,15 @@ class Player(val playerName: String, val playerType: PlayerType, val color: Int)
         return "$points pkt."
     }
 
-    fun addPoints(pointsToAdd: Int) {
+    private fun addPoints(pointsToAdd: Int) {
         points += pointsToAdd
         notifyPropertyChanged(BR.points)
         notifyPropertyChanged(BR.pointsString)
+    }
+
+    fun addPoints(pointsToAdd: Int, message: String) {
+        messageLiveData.postValue(message)
+        addPoints(pointsToAdd)
     }
 
     fun makeRandomMovement(board: Board) {

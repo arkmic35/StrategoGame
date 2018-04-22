@@ -2,6 +2,7 @@ package game
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayout
@@ -102,6 +103,18 @@ class GameActivity : AppCompatActivity() {
                 players = arrayOf(Player("Telefon 1", Player.PlayerType.PLAYER_CPU, colors[0]), Player("Telefon 2", Player.PlayerType.PLAYER_CPU, colors[1]))
             }
         }
+
+        players!![0].messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
+            if (message != null) {
+                Snackbar.make(findViewById(R.id.mainLayout), message, Snackbar.LENGTH_INDEFINITE).show()
+            }
+        })
+
+        players!![1].messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
+            if (message != null) {
+                Snackbar.make(findViewById(R.id.mainLayout), message, Snackbar.LENGTH_INDEFINITE).show()
+            }
+        })
 
         nextPlayer()
     }
