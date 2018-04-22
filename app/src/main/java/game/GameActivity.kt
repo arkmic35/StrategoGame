@@ -12,9 +12,10 @@ import com.arkmic35.stratego.databinding.ActivityGameBinding
 import java.util.*
 
 
-class GameActivity : AppCompatActivity() {
+class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener {
     private var boardSize = 0
     private var board: Board? = null
+    private var binding: ActivityGameBinding? = null
 
     private lateinit var tiles: Array<Array<TileView>>
     private var gameMode: GameMode? = null
@@ -32,14 +33,11 @@ class GameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = DataBindingUtil.setContentView<ActivityGameBinding>(this, R.layout.activity_game)
-
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
         tableFrame = findViewById(R.id.tableFrame)
 
         val extras = intent.extras
         boardSize = extras.getInt("BOARD_SIZE")
-        board = Board(boardSize)
-        drawTiles()
 
         when (extras.getInt("GAME_MODE")) {
             0 -> gameMode = GameMode.PLAYER_VS_PHONE
@@ -47,15 +45,23 @@ class GameActivity : AppCompatActivity() {
             2 -> gameMode = GameMode.PHONE_VS_PHONE
         }
 
+        prepareBoard()
+    }
+
+    private fun prepareBoard() {
+        board = Board(boardSize)
+        drawTiles()
+
         createPlayers()
-        binding.player1 = players!![0]
-        binding.player2 = players!![1]
+        binding!!.player1 = players!![0]
+        binding!!.player2 = players!![1]
     }
 
     private fun drawTiles() {
         val gridLayout = tableFrame!!
         gridLayout.columnCount = boardSize
         gridLayout.rowCount = boardSize
+        gridLayout.removeAllViews()
 
         val tileWidth = resources.getDimension(R.dimen.tiles_tile_width)
         val tileHeight = resources.getDimension(R.dimen.tiles_tile_height)
@@ -139,9 +145,29 @@ class GameActivity : AppCompatActivity() {
                 currentPlayer!!.makeRandomMovement(board!!)
                 nextPlayer()
             }
-
         } else {
-            TODO("Koniec gry")
+            val dialog = GameOverDialog()
+            val bundle = Bundle()
+            val points1 = players!![0].points
+            val points2 = players!![1].points
+
+            bundle.putString("WINNER",
+                    when {
+                        points1 > points2 -> players!![0].playerName
+                        points1 < points2 -> players!![1].playerName
+                        else -> null
+                    })
+
+            dialog.arguments = bundle
+            dialog.show(supportFragmentManager, "GAME_OVER")
         }
+    }
+
+    override fun playAgainClick() {
+        prepareBoard()
+    }
+
+    override fun openSettingsClick() {
+        onBackPressed()
     }
 }
