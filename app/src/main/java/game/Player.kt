@@ -6,7 +6,7 @@ import android.databinding.Bindable
 import com.arkmic35.stratego.BR
 import java.util.*
 
-class Player(val playerName: String, val playerType: PlayerType, val color: Int) : BaseObservable() {
+class Player(private val playerID: Int, val playerName: String, val playerType: PlayerType, val color: Int) : BaseObservable() {
     enum class PlayerType {
         HUMAN,
         CPU_RANDOM,
@@ -63,5 +63,20 @@ class Player(val playerName: String, val playerType: PlayerType, val color: Int)
 
     override fun toString(): String {
         return playerName
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Player
+
+        if (playerID != other.playerID) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return playerID
     }
 }

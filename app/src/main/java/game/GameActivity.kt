@@ -9,6 +9,7 @@ import android.support.v7.widget.GridLayout
 import android.widget.TextView
 import com.arkmic35.stratego.R
 import com.arkmic35.stratego.databinding.ActivityGameBinding
+import helper.CyclingArrayIterator
 import java.util.*
 
 
@@ -22,7 +23,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private var tableFrame: GridLayout? = null
     private var players: Array<Player>? = null
 
-    private var playersIterator: Iterator<Player>? = null
+    private var playersIterator: CyclingArrayIterator<Player>? = null
     private var currentPlayer: Player? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,9 +90,9 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
         players = Array(2, { playerID ->
             val player =
                     if (playerTypes!![playerID] == Player.PlayerType.HUMAN) {
-                        Player("Gracz ${playerID + 1}", Player.PlayerType.HUMAN, colors[playerID])
+                        Player(playerID, "Gracz ${playerID + 1}", Player.PlayerType.HUMAN, colors[playerID])
                     } else {
-                        Player(playerTypes!![playerID].name, playerTypes!![playerID], colors[playerID])
+                        Player(playerID, playerTypes!![playerID].name, playerTypes!![playerID], colors[playerID])
                     }
 
             player.messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
@@ -103,6 +104,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
             player
         })
 
+        playersIterator = CyclingArrayIterator(players!!)
         nextPlayer()
     }
 
@@ -115,10 +117,6 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
     private fun nextPlayer() {
         if (board!!.freeSpots > 0) {
-            if (playersIterator == null || !playersIterator!!.hasNext()) {
-                playersIterator = players!!.iterator()
-            }
-
             currentPlayer = playersIterator!!.next()
             findViewById<TextView>(R.id.gameStatus).text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
