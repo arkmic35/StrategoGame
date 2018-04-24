@@ -39,6 +39,7 @@ class Board(val size: Int) {
         }
 
         fields[rowIndex][columnIndex].player = player
+        freeFields.remove(Pair(rowIndex, columnIndex))
         freeSpots--
 
         if (isSidePosition(rowIndex, columnIndex)) {
