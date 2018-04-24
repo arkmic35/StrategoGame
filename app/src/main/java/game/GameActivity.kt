@@ -18,18 +18,12 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private var binding: ActivityGameBinding? = null
 
     private lateinit var tiles: Array<Array<TileView>>
-    private var gameMode: GameMode? = null
+    private var playerTypes: Array<Player.PlayerType>? = null
     private var tableFrame: GridLayout? = null
     private var players: Array<Player>? = null
 
     private var playersIterator: Iterator<Player>? = null
     private var currentPlayer: Player? = null
-
-    enum class GameMode {
-        PLAYER_VS_PHONE,
-        PLAYER_VS_PLAYER,
-        PHONE_VS_PHONE
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,12 +32,9 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
         val extras = intent.extras
         boardSize = extras.getInt("BOARD_SIZE")
-
-        when (extras.getInt("GAME_MODE")) {
-            0 -> gameMode = GameMode.PLAYER_VS_PHONE
-            1 -> gameMode = GameMode.PLAYER_VS_PLAYER
-            2 -> gameMode = GameMode.PHONE_VS_PHONE
-        }
+        playerTypes = Array(2, { playerNumber ->
+            Player.PlayerType.values()[extras.getInt("PLAYER${playerNumber + 1}_TYPE")]
+        })
 
         prepareBoard()
     }
@@ -94,32 +85,22 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     }
 
     private fun createPlayers() {
-        val colors = intArrayOf(ContextCompat.getColor(this, R.color.colorTileRed), ContextCompat.getColor(this, R.color.colorTileBlack))
+        val colors = intArrayOf(ContextCompat.getColor(this, R.color.colorTileBlue), ContextCompat.getColor(this, R.color.colorTileOrange))
+        players = Array(2, { playerID ->
+            val player =
+                    if (playerTypes!![playerID] == Player.PlayerType.HUMAN) {
+                        Player("Gracz ${playerID + 1}", Player.PlayerType.HUMAN, colors[playerID])
+                    } else {
+                        Player(playerTypes!![playerID].name, playerTypes!![playerID], colors[playerID])
+                    }
 
-        when (gameMode) {
-            GameMode.PLAYER_VS_PHONE -> {
-                players = arrayOf(Player("Gracz", Player.PlayerType.PLAYER_HUMAN, colors[0]), Player("Telefon", Player.PlayerType.PLAYER_CPU, colors[1]))
-            }
+            player.messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
+                if (message != null) {
+                    Snackbar.make(findViewById(R.id.mainLayout), message, Snackbar.LENGTH_INDEFINITE).show()
+                }
+            })
 
-            GameMode.PLAYER_VS_PLAYER -> {
-                players = arrayOf(Player("Gracz 1", Player.PlayerType.PLAYER_HUMAN, colors[0]), Player("Gracz 2", Player.PlayerType.PLAYER_HUMAN, colors[1]))
-            }
-
-            GameMode.PHONE_VS_PHONE -> {
-                players = arrayOf(Player("Telefon 1", Player.PlayerType.PLAYER_CPU, colors[0]), Player("Telefon 2", Player.PlayerType.PLAYER_CPU, colors[1]))
-            }
-        }
-
-        players!![0].messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
-            if (message != null) {
-                Snackbar.make(findViewById(R.id.mainLayout), message, Snackbar.LENGTH_INDEFINITE).show()
-            }
-        })
-
-        players!![1].messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
-            if (message != null) {
-                Snackbar.make(findViewById(R.id.mainLayout), message, Snackbar.LENGTH_INDEFINITE).show()
-            }
+            player
         })
 
         nextPlayer()
@@ -141,8 +122,8 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
             currentPlayer = playersIterator!!.next()
             findViewById<TextView>(R.id.gameStatus).text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
-            if (currentPlayer!!.playerType == Player.PlayerType.PLAYER_CPU) {
-                currentPlayer!!.makeRandomMovement(board!!)
+            if (currentPlayer!!.playerType != Player.PlayerType.HUMAN) {
+                currentPlayer!!.makeMovement(board!!)
                 nextPlayer()
             }
         } else {

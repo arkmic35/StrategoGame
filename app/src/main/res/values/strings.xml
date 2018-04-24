@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Stratego</string>
     <string name="pref_table_size">Rozmiar planszy</string>
-    <string name="pref_game_mode">Tryb gry</string>
     <string name="pref_play">Graj</string>
+    <string name="pref_player1">Gracz 1</string>
+    <string name="pref_player2">Gracz 2</string>
     <string name="game_currently">Teraz gra:\n%s</string>
 </resources>

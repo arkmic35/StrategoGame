@@ -3,9 +3,35 @@ package game
 import java.security.InvalidAlgorithmParameterException
 
 class Board(val size: Int) {
-    private val lastIndex = size - 1
-    val fields = Array(size, { Array(size, { Field() }) })
+    private var lastIndex = size - 1
+    var fields = Array(size, { Array(size, { Field() }) })
+    private var freeFields = generateAllFields(size)
     var freeSpots = size * size
+
+    companion object {
+        fun generateAllFields(size: Int): ArrayList<Pair<Int, Int>> {
+            val result = ArrayList<Pair<Int, Int>>(size * size)
+            val list = (0 until size).toList()
+
+            for (num1 in list) {
+                for (num2 in list) {
+                    result.add(Pair(num1, num2))
+                }
+            }
+
+            return result
+        }
+    }
+
+    constructor(other: Board) : this(other.size) {
+        for (rowIndex in other.fields.indices) {
+            for (columnIndex in other.fields.indices) {
+                fields[rowIndex][columnIndex] = Field(other.fields[rowIndex][columnIndex])
+            }
+        }
+
+        freeFields = ArrayList(other.freeFields)
+    }
 
     fun markField(player: Player, rowIndex: Int, columnIndex: Int) {
         if (fields[rowIndex][columnIndex].player != null) {

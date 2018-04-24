@@ -8,8 +8,10 @@ import java.util.*
 
 class Player(val playerName: String, val playerType: PlayerType, val color: Int) : BaseObservable() {
     enum class PlayerType {
-        PLAYER_HUMAN,
-        PLAYER_CPU
+        HUMAN,
+        CPU_RANDOM,
+        CPU_MINMAX,
+        CPU_ALPHABETA
     }
 
     val messageLiveData = MutableLiveData<String>()
@@ -34,7 +36,8 @@ class Player(val playerName: String, val playerType: PlayerType, val color: Int)
         addPoints(pointsToAdd)
     }
 
-    fun makeRandomMovement(board: Board) {
+    fun makeMovement(board: Board) {
+        //TODO dodać inne rodzaje ruchów niż random
         var rowIndex: Int
         var columnIndex: Int
         val random = Random()

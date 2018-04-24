@@ -9,6 +9,7 @@ import com.arkmic35.stratego.R
 import com.jaygoo.widget.RangeSeekBar
 import game.GameActivity
 
+
 class PreferencesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,10 +20,15 @@ class PreferencesActivity : AppCompatActivity() {
     fun startGame(@Suppress("UNUSED_PARAMETER") view: View) {
         val intent = Intent(this, GameActivity::class.java)
         val boardSize = findViewById<RangeSeekBar>(R.id.seekTableSize).currentRange
-        val gameMode = findViewById<Spinner>(R.id.selectGameMode).selectedItemPosition
+        val player1Mode = findViewById<Spinner>(R.id.selectPlayer1).selectedItemPosition
+        val player2Mode = findViewById<Spinner>(R.id.selectPlayer2).selectedItemPosition
+
+        println("Mode1: $player1Mode")
+        println("Mode2: $player2Mode")
 
         intent.putExtra("BOARD_SIZE", boardSize[0].toInt())
-        intent.putExtra("GAME_MODE", gameMode)
+        intent.putExtra("PLAYER1_TYPE", player1Mode)
+        intent.putExtra("PLAYER2_TYPE", player2Mode)
         startActivity(intent)
     }
 }

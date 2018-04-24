@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="gameModes">
-        <item>Gracz vs telefon</item>
-        <item>Gracz vs gracz</item>
-        <item>Telefon vs telefon</item>
+    <string-array name="playerModes">
+        <item>Osoba</item>
+        <item>CPU - random</item>
+        <item>CPU - min-max</item>
+        <item>CPU - alfa-beta</item>
     </string-array>
 </resources>

@@ -5,6 +5,6 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="colorTileGrey">#9E9E9E</color>
-    <color name="colorTileRed">#03A9F4</color>
-    <color name="colorTileBlack">#FF5722</color>
+    <color name="colorTileBlue">#03A9F4</color>
+    <color name="colorTileOrange">#FF5722</color>
 </resources>
