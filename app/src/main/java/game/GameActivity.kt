@@ -116,12 +116,12 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     }
 
     private fun nextPlayer() {
-        if (board!!.freeSpots > 0) {
+        if (!board!!.freeFields.isEmpty()) {
             currentPlayer = playersIterator!!.next()
             findViewById<TextView>(R.id.gameStatus).text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
             if (currentPlayer!!.playerType != Player.PlayerType.HUMAN) {
-                currentPlayer!!.makeAIMovement(board!!)
+                currentPlayer!!.makeAIMovement(board!!, players!!)
                 nextPlayer()
             }
         } else {

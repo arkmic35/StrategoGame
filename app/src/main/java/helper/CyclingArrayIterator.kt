@@ -1,11 +1,16 @@
 package helper
 
 class CyclingArrayIterator<T>(private val collection: Array<T>) {
-    var currentIndex = 0
-    val lastIndex = collection.size - 1
+    private val collectionSize = collection.size
+    private val lastIndex = collectionSize - 1
+    var currentIndex = lastIndex
 
     constructor(other: CyclingArrayIterator<T>) : this(other.collection) {
         currentIndex = other.currentIndex
+    }
+
+    fun current(): T {
+        return collection[currentIndex]
     }
 
     fun next(): T {

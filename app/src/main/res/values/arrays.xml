@@ -3,6 +3,7 @@
     <string-array name="playerModes">
         <item>Osoba</item>
         <item>CPU - random</item>
+        <item>CPU - zachłanny</item>
         <item>CPU - min-max</item>
         <item>CPU - alfa-beta</item>
     </string-array>
