@@ -36,18 +36,29 @@ class Player(val playerName: String, val playerType: PlayerType, val color: Int)
         addPoints(pointsToAdd)
     }
 
-    fun makeMovement(board: Board) {
-        //TODO dodać inne rodzaje ruchów niż random
+    fun makeAIMovement(board: Board) {
         var rowIndex: Int
         var columnIndex: Int
         val random = Random()
 
-        do {
-            rowIndex = random.nextInt(board.size)
-            columnIndex = random.nextInt(board.size)
-        } while (!board.isFieldFree(rowIndex, columnIndex))
+        when (playerType) {
+            Player.PlayerType.HUMAN -> {
+                return
+            }
 
-        board.markField(this, rowIndex, columnIndex)
+            Player.PlayerType.CPU_RANDOM -> {
+                val randomPair = board.freeFields[random.nextInt(board.freeFields.size)]
+                board.markField(this, randomPair.first, randomPair.second)
+            }
+
+            Player.PlayerType.CPU_MINMAX -> {
+                TODO()
+            }
+
+            Player.PlayerType.CPU_ALPHABETA -> {
+                TODO()
+            }
+        }
     }
 
     override fun toString(): String {

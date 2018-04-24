@@ -123,7 +123,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
             findViewById<TextView>(R.id.gameStatus).text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
             if (currentPlayer!!.playerType != Player.PlayerType.HUMAN) {
-                currentPlayer!!.makeMovement(board!!)
+                currentPlayer!!.makeAIMovement(board!!)
                 nextPlayer()
             }
         } else {

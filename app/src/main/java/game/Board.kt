@@ -5,7 +5,7 @@ import java.security.InvalidAlgorithmParameterException
 class Board(val size: Int) {
     private var lastIndex = size - 1
     var fields = Array(size, { Array(size, { Field() }) })
-    private var freeFields = generateAllFields(size)
+    var freeFields = generateAllFields(size)
     var freeSpots = size * size
 
     companion object {
