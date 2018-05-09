@@ -1,6 +1,5 @@
 package game.model
 
-import game.Field
 import game.Player
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidParameterException

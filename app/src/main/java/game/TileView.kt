@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayout
 import android.util.AttributeSet
 import android.view.View
 import com.arkmic35.stratego.R
+import game.model.Field
 import java.util.*
 
 class TileView : View, Observer {

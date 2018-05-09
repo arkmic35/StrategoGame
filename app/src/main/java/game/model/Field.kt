@@ -1,5 +1,6 @@
-package game
+package game.model
 
+import game.Player
 import java.util.*
 
 class Field() : Observable() {
