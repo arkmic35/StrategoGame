@@ -1,6 +1,9 @@
-package game
+package game.model
 
+import game.Field
+import game.Player
 import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidParameterException
 
 class Board(val size: Int) {
     private var lastIndex = size - 1
@@ -33,7 +36,7 @@ class Board(val size: Int) {
     }
 
     fun getPointsForMarkingField(rowIndex: Int, columnIndex: Int): Int {
-        if (!isFieldFree(rowIndex, columnIndex)) {
+        if (!isFieldPositionCorrect(rowIndex, columnIndex) || !isFieldFree(rowIndex, columnIndex)) {
             throw InvalidAlgorithmParameterException()
         }
 
@@ -44,7 +47,7 @@ class Board(val size: Int) {
     }
 
     fun markField(player: Player, rowIndex: Int, columnIndex: Int) {
-        if (!isFieldFree(rowIndex, columnIndex)) {
+        if (!isFieldPositionCorrect(rowIndex, columnIndex) || !isFieldFree(rowIndex, columnIndex)) {
             throw InvalidAlgorithmParameterException()
         }
 
@@ -60,7 +63,7 @@ class Board(val size: Int) {
     }
 
     private fun unmarkField(rowIndex: Int, columnIndex: Int) {
-        if (isFieldFree(rowIndex, columnIndex)) {
+        if (!isFieldPositionCorrect(rowIndex, columnIndex) || isFieldFree(rowIndex, columnIndex)) {
             throw InvalidAlgorithmParameterException()
         }
 
@@ -72,6 +75,10 @@ class Board(val size: Int) {
     }
 
     private fun calculatePointsForField(rowIndex: Int, columnIndex: Int, composeMessage: Boolean): Pair<Int, StringBuilder> {
+        if (!isFieldPositionCorrect(rowIndex, columnIndex)) {
+            throw InvalidParameterException()
+        }
+
         var pointsToAdd = 0
         val message = StringBuilder()
 
@@ -80,7 +87,7 @@ class Board(val size: Int) {
                 pointsToAdd += size
 
                 if (composeMessage) {
-                    message.append(String.format("\n+%d pkt za wypełnienie kolumny #%d", size, columnIndex + 1))
+                    message.append("\n+$size pkt za kolumnę ${columnIndex + 1}")
                 }
             }
 
@@ -88,29 +95,45 @@ class Board(val size: Int) {
                 pointsToAdd += size
 
                 if (composeMessage) {
-                    message.append("\n+$size pkt za wypełnienie wiersza #" + (rowIndex + 1))
+                    message.append("\n+$size pkt za wiersz ${'A' + rowIndex}")
                 }
             }
 
-            val farLeftDiagonal = findFarLeftDiagonal(rowIndex, columnIndex)
-            val leftDiagonalPoints = checkFarLeftDiagonal(farLeftDiagonal[0], farLeftDiagonal[1])
+            val topLeftDiagonalStartPoint = findTopLeftDiagonalStart(rowIndex, columnIndex)
+            val (topLeftDiagonalPoints, leftDiagonalEndPoint) = checkTopLeftDiagonal(topLeftDiagonalStartPoint.first, topLeftDiagonalStartPoint.second)
 
-            if (leftDiagonalPoints > 1) {
-                pointsToAdd += leftDiagonalPoints
+            if (topLeftDiagonalPoints > 1) {
+                pointsToAdd += topLeftDiagonalPoints
 
                 if (composeMessage) {
-                    message.append(String.format("\n+%d pkt za wypełnienie linii ukośnej od (%d, %d)", leftDiagonalPoints, farLeftDiagonal[0] + 1, farLeftDiagonal[1] + 1))
+                    message.append(
+                            String.format("\n+%d pkt za linię \u2198 od %c%d do %c%d",
+                                    topLeftDiagonalPoints,
+                                    'A' + topLeftDiagonalStartPoint.first,
+                                    topLeftDiagonalStartPoint.second + 1,
+                                    'A' + leftDiagonalEndPoint.first,
+                                    leftDiagonalEndPoint.second + 1
+                            )
+                    )
                 }
             }
 
-            val farRightDiagonal = findFarRightDiagonal(rowIndex, columnIndex)
-            val rightDiagonalPoints = checkFarRightDiagonal(farRightDiagonal[0], farRightDiagonal[1])
+            val bottomLeftDiagonalStartPoint = findBottomLeftDiagonalStart(rowIndex, columnIndex)
+            val (bottomLeftDiagonalPoints, bottomLeftDiagonalEndPoint) = checkBottomLeftDiagonal(bottomLeftDiagonalStartPoint.first, bottomLeftDiagonalStartPoint.second)
 
-            if (rightDiagonalPoints > 1) {
-                pointsToAdd += rightDiagonalPoints
+            if (bottomLeftDiagonalPoints > 1) {
+                pointsToAdd += bottomLeftDiagonalPoints
 
                 if (composeMessage) {
-                    message.append(String.format("\n+%d pkt za wypełnienie linii ukośnej od (%d, %d)", rightDiagonalPoints, farRightDiagonal[0] + 1, farRightDiagonal[1] + 1))
+                    message.append(
+                            String.format("\n+%d pkt za linię \u2197 od %c%d do %c%d",
+                                    bottomLeftDiagonalPoints,
+                                    'A' + bottomLeftDiagonalStartPoint.first,
+                                    bottomLeftDiagonalStartPoint.second + 1,
+                                    'A' + bottomLeftDiagonalEndPoint.first,
+                                    bottomLeftDiagonalEndPoint.second + 1
+                            )
+                    )
                 }
             }
         }
@@ -119,6 +142,10 @@ class Board(val size: Int) {
     }
 
     fun isFieldFree(rowIndex: Int, columnIndex: Int): Boolean {
+        if (!isFieldPositionCorrect(rowIndex, columnIndex)) {
+            throw InvalidParameterException()
+        }
+
         return fields[rowIndex][columnIndex].player == null
     }
 
@@ -148,7 +175,7 @@ class Board(val size: Int) {
         return true
     }
 
-    private fun findFarLeftDiagonal(rowIndex: Int, columnIndex: Int): IntArray {
+    private fun findTopLeftDiagonalStart(rowIndex: Int, columnIndex: Int): Pair<Int, Int> {
         var checkRow = rowIndex
         var checkColumn = columnIndex
 
@@ -157,10 +184,10 @@ class Board(val size: Int) {
             checkColumn--
         }
 
-        return intArrayOf(checkRow, checkColumn)
+        return Pair(checkRow, checkColumn)
     }
 
-    private fun checkFarLeftDiagonal(rowIndex: Int, columnIndex: Int): Int {
+    private fun checkTopLeftDiagonal(rowIndex: Int, columnIndex: Int): Pair<Int, Pair<Int, Int>> {
         assert(isSidePosition(rowIndex, columnIndex))
         var checkRow = rowIndex
         var checkColumn = columnIndex
@@ -168,23 +195,35 @@ class Board(val size: Int) {
 
         while (isFieldPositionCorrect(checkRow, checkColumn)) {
             if (isFieldFree(checkRow, checkColumn)) {
-                return 0
+                break
             }
 
             length++
 
             if (checkRow == lastIndex || checkColumn == lastIndex) {
-                break
+                return Pair(length, Pair(checkRow, checkColumn))
             }
 
             checkRow++
             checkColumn++
         }
 
-        return length
+        return Pair(0, Pair(0, 0))
     }
 
-    private fun checkFarRightDiagonal(rowIndex: Int, columnIndex: Int): Int {
+    private fun findBottomLeftDiagonalStart(rowIndex: Int, columnIndex: Int): Pair<Int, Int> {
+        var checkRow = rowIndex
+        var checkColumn = columnIndex
+
+        while (checkRow != lastIndex && checkColumn != 0) {
+            checkRow++
+            checkColumn--
+        }
+
+        return Pair(checkRow, checkColumn)
+    }
+
+    private fun checkBottomLeftDiagonal(rowIndex: Int, columnIndex: Int): Pair<Int, Pair<Int, Int>> {
         assert(isSidePosition(rowIndex, columnIndex))
         var checkRow = rowIndex
         var checkColumn = columnIndex
@@ -192,31 +231,19 @@ class Board(val size: Int) {
 
         while (isFieldPositionCorrect(checkRow, checkColumn)) {
             if (isFieldFree(checkRow, checkColumn)) {
-                return 0
+                break
             }
 
             length++
 
-            if (checkRow == lastIndex || checkColumn == 0) {
-                break
+            if (checkRow == 0 || checkColumn == lastIndex) {
+                return Pair(length, Pair(checkRow, checkColumn))
             }
 
-            checkRow++
-            checkColumn--
-        }
-
-        return length
-    }
-
-    private fun findFarRightDiagonal(rowIndex: Int, columnIndex: Int): IntArray {
-        var checkRow = rowIndex
-        var checkColumn = columnIndex
-
-        while (checkRow != 0 && checkColumn != lastIndex) {
             checkRow--
             checkColumn++
         }
 
-        return intArrayOf(checkRow, checkColumn)
+        return Pair(0, Pair(0, 0))
     }
 }

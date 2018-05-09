@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.databinding.BaseObservable
 import android.databinding.Bindable
 import com.arkmic35.stratego.BR
+import game.model.Board
 import simulation.MinMax
 import java.util.*
 

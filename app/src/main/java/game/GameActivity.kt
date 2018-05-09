@@ -9,6 +9,7 @@ import android.support.v7.widget.GridLayout
 import android.widget.TextView
 import com.arkmic35.stratego.R
 import com.arkmic35.stratego.databinding.ActivityGameBinding
+import game.model.Board
 import helper.CyclingArrayIterator
 import java.util.*
 

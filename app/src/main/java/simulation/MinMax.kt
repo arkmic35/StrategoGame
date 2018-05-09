@@ -1,7 +1,7 @@
 package simulation
 
-import game.Board
 import game.Player
+import game.model.Board
 import helper.CyclingArrayIterator
 
 class MinMax(allPlayers: Array<Player>, private val mainPlayerIndex: Int, board: Board) {
