@@ -1,12 +1,12 @@
 package simulation
 
-import game.Player
 import game.model.Board
+import game.model.player.Player
 import helper.CyclingArrayIterator
 
 class MinMax(allPlayers: Array<Player>, private val mainPlayerIndex: Int, board: Board) {
     private val allPlayers = Array(allPlayers.size, { arrayIndex ->
-        Player(allPlayers[arrayIndex])
+        allPlayers[arrayIndex].clone()
     })
     private val amountOfPlayers = allPlayers.size
     private val board = Board(board)

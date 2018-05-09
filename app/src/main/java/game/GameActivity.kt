@@ -10,7 +10,9 @@ import android.widget.TextView
 import com.arkmic35.stratego.R
 import com.arkmic35.stratego.databinding.ActivityGameBinding
 import game.model.Board
+import game.model.player.*
 import helper.CyclingArrayIterator
+import java.security.InvalidParameterException
 import java.util.*
 
 
@@ -20,7 +22,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private var binding: ActivityGameBinding? = null
 
     private lateinit var tiles: Array<Array<TileView>>
-    private var playerTypes: Array<Player.PlayerType>? = null
+    private var playerTypes: Array<Int>? = null
     private var tableFrame: GridLayout? = null
     private var players: Array<Player>? = null
 
@@ -35,7 +37,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
         val extras = intent.extras
         boardSize = extras.getInt("BOARD_SIZE")
         playerTypes = Array(2, { playerNumber ->
-            Player.PlayerType.values()[extras.getInt("PLAYER${playerNumber + 1}_TYPE")]
+            extras.getInt("PLAYER${playerNumber + 1}_TYPE")
         })
 
         prepareBoard()
@@ -88,12 +90,17 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
     private fun createPlayers() {
         val colors = intArrayOf(ContextCompat.getColor(this, R.color.colorTileBlue), ContextCompat.getColor(this, R.color.colorTileOrange))
-        players = Array(2, { playerID ->
+
+
+        players = Array(2, { playerId ->
             val player =
-                    if (playerTypes!![playerID] == Player.PlayerType.HUMAN) {
-                        Player(playerID, "Gracz ${playerID + 1}", Player.PlayerType.HUMAN, colors[playerID])
-                    } else {
-                        Player(playerID, playerTypes!![playerID].name, playerTypes!![playerID], colors[playerID])
+                    when (playerTypes!![playerId]) {
+                        0 -> HumanPlayer(playerId, "Gracz ${playerId + 1}", colors[playerId])
+                        1 -> CpuRandomPlayer(playerId, "Random", colors[playerId])
+                        2 -> CpuGreedyPlayer(playerId, "Zachłanny", colors[playerId])
+                        3 -> CpuMinMaxPlayer(playerId, "MinMax", colors[playerId])
+                        4 -> CpuAlphaBetaPlayer(playerId, "AlfaBeta", colors[playerId])
+                        else -> throw InvalidParameterException("Unknown type of player")
                     }
 
             player.messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
@@ -121,8 +128,9 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
             currentPlayer = playersIterator!!.next()
             findViewById<TextView>(R.id.gameStatus).text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
-            if (currentPlayer!!.playerType != Player.PlayerType.HUMAN) {
-                currentPlayer!!.makeAIMovement(board!!, players!!)
+            if (currentPlayer!! is CpuPlayer) {
+                val player = currentPlayer!! as CpuPlayer
+                player.makeAIMovement(board!!, players!!)
                 nextPlayer()
             }
         } else {

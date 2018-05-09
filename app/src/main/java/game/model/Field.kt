@@ -1,6 +1,6 @@
 package game.model
 
-import game.Player
+import game.model.player.Player
 import java.util.*
 
 class Field() : Observable() {

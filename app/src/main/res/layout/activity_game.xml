@@ -8,11 +8,11 @@
 
         <variable
             name="player1"
-            type="game.Player" />
+            type="game.model.player.Player" />
 
         <variable
             name="player2"
-            type="game.Player" />
+            type="game.model.player.Player" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout

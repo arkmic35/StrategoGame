@@ -1,6 +1,7 @@
 package game.model
 
-import game.Player
+import game.model.player.HumanPlayer
+import game.model.player.Player
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidParameterException
 
@@ -39,7 +40,7 @@ class Board(val size: Int) {
             throw InvalidAlgorithmParameterException()
         }
 
-        fields[rowIndex][columnIndex].player = Player(999, "Simulator", Player.PlayerType.SIMULATOR, 0)
+        fields[rowIndex][columnIndex].player = HumanPlayer(999, "Simulator", 0)
         val (result, _) = calculatePointsForField(rowIndex, columnIndex, false)
         unmarkField(rowIndex, columnIndex)
         return result
