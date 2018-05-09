@@ -15,6 +15,7 @@ class PreferencesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preferences)
+        findViewById<RangeSeekBar>(R.id.seekTableSize).setValue(7F)
     }
 
     fun startGame(@Suppress("UNUSED_PARAMETER") view: View) {

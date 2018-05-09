@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="playerModes">
-        <item>Osoba</item>
+        <item>Człowiek</item>
         <item>CPU - random</item>
         <item>CPU - zachłanny</item>
         <item>CPU - min-max</item>
