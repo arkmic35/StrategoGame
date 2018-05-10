@@ -6,6 +6,8 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayout
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.arkmic35.stratego.R
 import com.arkmic35.stratego.databinding.ActivityGameBinding
@@ -28,11 +30,17 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
     private var playersIterator: CyclingArrayIterator<Player>? = null
     private var currentPlayer: Player? = null
+    private var humanActionAllowed = false
+
+    private var gameStatusText: TextView? = null
+    private var progressBar: ProgressBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_game)
         tableFrame = findViewById(R.id.tableFrame)
+        gameStatusText = findViewById(R.id.gameStatus)
+        progressBar = findViewById(R.id.progressBar)
 
         val extras = intent.extras
         boardSize = extras.getInt("BOARD_SIZE")
@@ -91,7 +99,6 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private fun createPlayers() {
         val colors = intArrayOf(ContextCompat.getColor(this, R.color.colorTileBlue), ContextCompat.getColor(this, R.color.colorTileOrange))
 
-
         players = Array(2, { playerId ->
             val player =
                     when (playerTypes!![playerId]) {
@@ -117,7 +124,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     }
 
     private fun humanPlayerAction(rowIndex: Int?, columnIndex: Int?) {
-        if (rowIndex != null && columnIndex != null && board!!.isFieldFree(rowIndex, columnIndex)) {
+        if (humanActionAllowed && rowIndex != null && columnIndex != null && board!!.isFieldFree(rowIndex, columnIndex)) {
             board!!.markField(currentPlayer!!, rowIndex, columnIndex)
             nextPlayer()
         }
@@ -126,12 +133,25 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private fun nextPlayer() {
         if (!board!!.freeFields.isEmpty()) {
             currentPlayer = playersIterator!!.next()
-            findViewById<TextView>(R.id.gameStatus).text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
             if (currentPlayer!! is CpuPlayer) {
                 val player = currentPlayer!! as CpuPlayer
-                player.makeAIMovement(board!!, players!!)
-                nextPlayer()
+
+                humanActionAllowed = false
+                gameStatusText!!.visibility = View.GONE
+                progressBar!!.visibility = View.VISIBLE
+
+                player.makeAIMovement(board!!, players!!).subscribe({}, {}, {
+                    progressBar!!.visibility = View.GONE
+                    nextPlayer()
+                })
+
+            } else {
+                gameStatusText!!.text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
+
+                humanActionAllowed = true
+                gameStatusText!!.visibility = View.VISIBLE
+                progressBar!!.visibility = View.GONE
             }
         } else {
             val dialog = GameOverDialog()

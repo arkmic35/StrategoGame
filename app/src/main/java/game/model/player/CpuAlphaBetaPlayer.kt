@@ -1,6 +1,7 @@
 package game.model.player
 
 import game.model.Board
+import io.reactivex.Observable
 
 class CpuAlphaBetaPlayer(playerID: Int, playerName: String, color: Int) : CpuPlayer(playerID, playerName, color) {
 
@@ -8,7 +9,7 @@ class CpuAlphaBetaPlayer(playerID: Int, playerName: String, color: Int) : CpuPla
         points = other.points
     }
 
-    override fun makeAIMovement(board: Board, players: Array<Player>) {
+    override fun makeAIMovement(board: Board, players: Array<Player>): Observable<Void> {
         TODO("not implemented")
     }
 

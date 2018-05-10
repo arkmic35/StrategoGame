@@ -9,6 +9,7 @@ class Board(val size: Int) {
     private var lastIndex = size - 1
     var fields = Array(size, { Array(size, { Field() }) })
     var freeFields = generateAllFields(size)
+    private var boardForTesting = false
 
     companion object {
         fun generateAllFields(size: Int): ArrayList<Pair<Int, Int>> {
@@ -25,7 +26,9 @@ class Board(val size: Int) {
         }
     }
 
-    constructor(other: Board) : this(other.size) {
+    constructor(other: Board) : this(other, false)
+
+    constructor(other: Board, boardForTesting: Boolean) : this(other.size) {
         for (rowIndex in other.fields.indices) {
             for (columnIndex in other.fields.indices) {
                 fields[rowIndex][columnIndex] = Field(other.fields[rowIndex][columnIndex])
@@ -33,6 +36,7 @@ class Board(val size: Int) {
         }
 
         freeFields = ArrayList(other.freeFields)
+        this.boardForTesting = boardForTesting
     }
 
     fun getPointsForMarkingField(rowIndex: Int, columnIndex: Int): Int {
@@ -54,15 +58,28 @@ class Board(val size: Int) {
         fields[rowIndex][columnIndex].player = player
         freeFields.remove(Pair(rowIndex, columnIndex))
 
-        val (pointsToAdd, message) = calculatePointsForField(rowIndex, columnIndex, true)
-        message.insert(0, player.playerName + " otrzymuje:")
+        if (!boardForTesting) {
+            val (pointsToAdd, message) = calculatePointsForField(rowIndex, columnIndex, true)
+            message.insert(0, player.playerName + " otrzymuje:")
 
-        if (pointsToAdd != 0) {
-            player.addPoints(pointsToAdd, message.toString())
+            if (pointsToAdd != 0) {
+                player.addPoints(pointsToAdd, message.toString())
+            }
         }
     }
 
-    private fun unmarkField(rowIndex: Int, columnIndex: Int) {
+    fun findBestGreedyField(): Pair<Int, Int> {
+        val boardCopy = Board(this)
+        val possibleMovements = boardCopy.freeFields
+        val pointsForMovements = IntArray(possibleMovements.size, { index ->
+            boardCopy.getPointsForMarkingField(possibleMovements[index].first, possibleMovements[index].second)
+        })
+
+        val bestMovementIndex = (pointsForMovements.indices.maxBy { it -> pointsForMovements[it] })!!
+        return possibleMovements[bestMovementIndex]
+    }
+
+    fun unmarkField(rowIndex: Int, columnIndex: Int) {
         if (!isFieldPositionCorrect(rowIndex, columnIndex) || isFieldFree(rowIndex, columnIndex)) {
             throw InvalidAlgorithmParameterException()
         }
