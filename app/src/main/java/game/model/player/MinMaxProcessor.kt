@@ -4,7 +4,7 @@ import game.model.Board
 
 class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, board: Board) {
     companion object {
-        const val GREEDY_MINMAX_MAX_DEPTH = 4
+        const val MAX_DEPTH = 4
     }
 
     private val players = Array(players.size, { arrayIndex ->
@@ -21,7 +21,7 @@ class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, bo
     }
 
     private fun recursive(board: Board, currentPlayerIndex: Int, pointsDifference: Int, depth: Int): Int {
-        if (board.freeFields.isEmpty() || depth > GREEDY_MINMAX_MAX_DEPTH) {
+        if (board.freeFields.isEmpty() || depth > MAX_DEPTH) {
             return pointsDifference
         }
 
