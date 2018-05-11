@@ -14,6 +14,7 @@ import com.arkmic35.stratego.databinding.ActivityGameBinding
 import game.model.Board
 import game.model.player.*
 import helper.CyclingArrayIterator
+import io.reactivex.disposables.Disposable
 import java.security.InvalidParameterException
 import java.util.*
 
@@ -30,7 +31,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
     private var playersIterator: CyclingArrayIterator<Player>? = null
     private var currentPlayer: Player? = null
-    private var humanActionAllowed = false
+    private var ongoingAISubscription: Disposable? = null
 
     private var gameStatusText: TextView? = null
     private var progressBar: ProgressBar? = null
@@ -49,6 +50,14 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
         })
 
         prepareBoard()
+    }
+
+    override fun onDestroy() {
+        if (ongoingAISubscription != null) {
+            ongoingAISubscription!!.dispose()
+        }
+
+        super.onDestroy()
     }
 
     private fun prepareBoard() {
@@ -99,14 +108,22 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private fun createPlayers() {
         val colors = intArrayOf(ContextCompat.getColor(this, R.color.colorTileBlue), ContextCompat.getColor(this, R.color.colorTileOrange))
 
+        val playerSuffixes = Array(2, { index ->
+            if (playerTypes!![0] == playerTypes!![1]) {
+                String.format(" %d", index + 1)
+            } else {
+                ""
+            }
+        })
+
         players = Array(2, { playerId ->
             val player =
                     when (playerTypes!![playerId]) {
-                        0 -> HumanPlayer(playerId, "Gracz ${playerId + 1}", colors[playerId])
-                        1 -> CpuRandomPlayer(playerId, "Random", colors[playerId])
-                        2 -> CpuGreedyPlayer(playerId, "Zachłanny", colors[playerId])
-                        3 -> CpuMinMaxPlayer(playerId, "MinMax", colors[playerId])
-                        4 -> CpuAlphaBetaPlayer(playerId, "AlfaBeta", colors[playerId])
+                        0 -> HumanPlayer(playerId, "Gracz${playerSuffixes[playerId]}", colors[playerId])
+                        1 -> CpuRandomPlayer(playerId, "Random${playerSuffixes[playerId]}", colors[playerId])
+                        2 -> CpuGreedyPlayer(playerId, "Zachłanny${playerSuffixes[playerId]}", colors[playerId])
+                        3 -> CpuMinMaxPlayer(playerId, "MinMax${playerSuffixes[playerId]}", colors[playerId])
+                        4 -> CpuAlphaBetaPlayer(playerId, "AlfaBeta${playerSuffixes[playerId]}", colors[playerId])
                         else -> throw InvalidParameterException("Unknown type of player")
                     }
 
@@ -124,7 +141,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     }
 
     private fun humanPlayerAction(rowIndex: Int?, columnIndex: Int?) {
-        if (humanActionAllowed && rowIndex != null && columnIndex != null && board!!.isFieldFree(rowIndex, columnIndex)) {
+        if (ongoingAISubscription == null && rowIndex != null && columnIndex != null && board!!.isFieldFree(rowIndex, columnIndex)) {
             board!!.markField(currentPlayer!!, rowIndex, columnIndex)
             nextPlayer()
         }
@@ -137,19 +154,18 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
             if (currentPlayer!! is CpuPlayer) {
                 val player = currentPlayer!! as CpuPlayer
 
-                humanActionAllowed = false
                 gameStatusText!!.visibility = View.GONE
                 progressBar!!.visibility = View.VISIBLE
 
-                player.makeAIMovement(board!!, players!!).subscribe({}, {}, {
+                ongoingAISubscription = player.makeAIMovement(board!!, players!!).subscribe({}, {}, {
                     progressBar!!.visibility = View.GONE
                     nextPlayer()
+                    ongoingAISubscription = null
                 })
 
             } else {
                 gameStatusText!!.text = String.format(Locale.getDefault(), getString(R.string.game_currently), currentPlayer)
 
-                humanActionAllowed = true
                 gameStatusText!!.visibility = View.VISIBLE
                 progressBar!!.visibility = View.GONE
             }

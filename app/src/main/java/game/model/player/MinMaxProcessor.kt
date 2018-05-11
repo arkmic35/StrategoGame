@@ -31,9 +31,11 @@ class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, bo
                 else
                     currentPlayerIndex + 1
 
+        val freeFieldsCopy = ArrayList(board.freeFields)
+
         if (currentPlayerIndex == myPlayerIndex) {
-            val pointsForFields = IntArray(board.freeFields.size, { index ->
-                val position = board.freeFields[index]
+            val pointsForFields = IntArray(freeFieldsCopy.size, { index ->
+                val position = freeFieldsCopy[index]
                 val points = board.getPointsForMarkingField(position.first, position.second)
 
                 board.markField(players[currentPlayerIndex], position.first, position.second)
@@ -46,13 +48,13 @@ class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, bo
             val bestIndex = pointsForFields.indices.maxBy { it -> pointsForFields[it] }!!
 
             if (depth == 0) {
-                selectedField = board.freeFields[bestIndex]
+                selectedField = freeFieldsCopy[bestIndex]
             }
 
             return pointsForFields[bestIndex]
         } else {
-            val pointsForFields = IntArray(board.freeFields.size, { index ->
-                val position = board.freeFields[index]
+            val pointsForFields = IntArray(freeFieldsCopy.size, { index ->
+                val position = freeFieldsCopy[index]
                 val points = board.getPointsForMarkingField(position.first, position.second)
 
                 board.markField(players[currentPlayerIndex], position.first, position.second)
