@@ -116,25 +116,6 @@ class Board(val size: Int) {
                 }
             }
 
-            val topLeftDiagonalStartPoint = findTopLeftDiagonalStart(rowIndex, columnIndex)
-            val (topLeftDiagonalPoints, leftDiagonalEndPoint) = checkTopLeftDiagonal(topLeftDiagonalStartPoint.first, topLeftDiagonalStartPoint.second)
-
-            if (topLeftDiagonalPoints > 1) {
-                pointsToAdd += topLeftDiagonalPoints
-
-                if (composeMessage) {
-                    message.append(
-                            String.format("\n+%d pkt za linię \u2198 od %c%d do %c%d",
-                                    topLeftDiagonalPoints,
-                                    'A' + topLeftDiagonalStartPoint.first,
-                                    topLeftDiagonalStartPoint.second + 1,
-                                    'A' + leftDiagonalEndPoint.first,
-                                    leftDiagonalEndPoint.second + 1
-                            )
-                    )
-                }
-            }
-
             val bottomLeftDiagonalStartPoint = findBottomLeftDiagonalStart(rowIndex, columnIndex)
             val (bottomLeftDiagonalPoints, bottomLeftDiagonalEndPoint) = checkBottomLeftDiagonal(bottomLeftDiagonalStartPoint.first, bottomLeftDiagonalStartPoint.second)
 
@@ -143,12 +124,31 @@ class Board(val size: Int) {
 
                 if (composeMessage) {
                     message.append(
-                            String.format("\n+%d pkt za linię \u2197 od %c%d do %c%d",
+                            String.format("\n+%d pkt za %c%d \u2197 %c%d",
                                     bottomLeftDiagonalPoints,
                                     'A' + bottomLeftDiagonalStartPoint.first,
                                     bottomLeftDiagonalStartPoint.second + 1,
                                     'A' + bottomLeftDiagonalEndPoint.first,
                                     bottomLeftDiagonalEndPoint.second + 1
+                            )
+                    )
+                }
+            }
+
+            val topLeftDiagonalStartPoint = findTopLeftDiagonalStart(rowIndex, columnIndex)
+            val (topLeftDiagonalPoints, leftDiagonalEndPoint) = checkTopLeftDiagonal(topLeftDiagonalStartPoint.first, topLeftDiagonalStartPoint.second)
+
+            if (topLeftDiagonalPoints > 1) {
+                pointsToAdd += topLeftDiagonalPoints
+
+                if (composeMessage) {
+                    message.append(
+                            String.format("\n+%d pkt za %c%d \u2198 %c%d",
+                                    topLeftDiagonalPoints,
+                                    'A' + topLeftDiagonalStartPoint.first,
+                                    topLeftDiagonalStartPoint.second + 1,
+                                    'A' + leftDiagonalEndPoint.first,
+                                    leftDiagonalEndPoint.second + 1
                             )
                     )
                 }
