@@ -1,11 +1,13 @@
 package game
 
 import android.databinding.DataBindingUtil
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayout
+import android.view.Gravity
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -24,7 +26,6 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private var board: Board? = null
     private var binding: ActivityGameBinding? = null
 
-    private lateinit var tiles: Array<Array<TileView>>
     private var playerTypes: Array<Int>? = null
     private var tableFrame: GridLayout? = null
     private var players: Array<Player>? = null
@@ -71,38 +72,58 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
     private fun drawTiles() {
         val gridLayout = tableFrame!!
-        gridLayout.columnCount = boardSize
-        gridLayout.rowCount = boardSize
+        gridLayout.columnCount = boardSize + 1
+        gridLayout.rowCount = boardSize + 1
         gridLayout.removeAllViews()
 
-        val tileWidth = resources.getDimension(R.dimen.tiles_tile_width)
-        val tileHeight = resources.getDimension(R.dimen.tiles_tile_height)
-        val spaceBetweenTiles = resources.getDimension(R.dimen.tiles_space_between)
+        val tileWidth = resources.getDimension(R.dimen.tiles_tile_width).toInt()
+        val tileHeight = resources.getDimension(R.dimen.tiles_tile_height).toInt()
+        val spaceBetweenTiles = resources.getDimension(R.dimen.tiles_space_between).toInt()
 
-        tiles = Array(boardSize, { rowIndex ->
-            Array(boardSize, { columnIndex ->
-                val tileView = TileView(
-                        this,
-                        tileWidth.toInt(),
-                        tileHeight.toInt(),
-                        spaceBetweenTiles.toInt(),
-                        rowIndex,
-                        columnIndex)
+        for (rowIndex in 0..boardSize) {
+            for (columnIndex in 0..boardSize) {
+                val firstRow = rowIndex == 0
+                val firstColumn = columnIndex == 0
+                val params = GridLayout.LayoutParams()
+                params.setGravity(Gravity.CENTER)
 
-                val field = board!!.fields[rowIndex][columnIndex]
+                if (firstRow || firstColumn) {
+                    val textView = TextView(this)
+                    textView.typeface = Typeface.DEFAULT_BOLD
+                    textView.layoutParams = params
 
-                tileView.field = field
-                field.addObserver(tileView)
+                    if (firstRow && !firstColumn) { //etykiety kolumn 1,2,3,4,...
+                        textView.text = columnIndex.toString()
+                    } else if (!firstRow && firstColumn) { //etykiety wierszy A,B,C,D,...
+                        textView.text = ('A' + rowIndex - 1).toString()
+                        params.marginEnd = 16
+                    } else { //punkt (0,0)
+                    }
 
-                tileView.setOnClickListener({ view ->
-                    (view as TileView)
-                    humanPlayerAction(view.rowIndex, view.columnIndex)
-                })
+                    gridLayout.addView(textView)
+                } else {
+                    val tileView = TileView(
+                            this,
+                            tileWidth,
+                            tileHeight,
+                            spaceBetweenTiles,
+                            rowIndex - 1,
+                            columnIndex - 1)
 
-                gridLayout.addView(tileView)
-                tileView
-            })
-        })
+                    val field = board!!.fields[rowIndex - 1][columnIndex - 1]
+
+                    tileView.field = field
+                    field.addObserver(tileView)
+
+                    tileView.setOnClickListener({ view ->
+                        (view as TileView)
+                        humanPlayerAction(view.rowIndex, view.columnIndex)
+                    })
+
+                    gridLayout.addView(tileView)
+                }
+            }
+        }
     }
 
     private fun createPlayers() {
