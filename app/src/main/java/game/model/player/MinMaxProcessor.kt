@@ -58,7 +58,7 @@ class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, bo
                 val points = board.getPointsForMarkingField(position.first, position.second)
 
                 board.markField(players[currentPlayerIndex], position.first, position.second)
-                val result = recursive(board, nextPlayer, pointsDifference + points, depth + 1)
+                val result = recursive(board, nextPlayer, pointsDifference - points, depth + 1)
                 board.unmarkField(position.first, position.second)
 
                 result
