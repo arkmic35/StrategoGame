@@ -5,10 +5,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class AlphaBetaProcessor(players: Array<Player>, private val myPlayerIndex: Int, board: Board) {
-    companion object {
-        const val MAX_DEPTH = 5
-    }
-
     private val players = Array(players.size, { arrayIndex ->
         players[arrayIndex].clone()
     })
@@ -16,14 +12,16 @@ class AlphaBetaProcessor(players: Array<Player>, private val myPlayerIndex: Int,
     private val board = Board(board, true)
 
     private var selectedField: Pair<Int, Int>? = null
+    private var aiDepth = 4
 
-    fun calculate(): Pair<Int, Int> {
+    fun calculate(aiDepth: Int): Pair<Int, Int> {
+        this.aiDepth = aiDepth
         recursive(board, myPlayerIndex, 0, Int.MIN_VALUE, Int.MAX_VALUE, 0)
         return selectedField!!
     }
 
     private fun recursive(board: Board, currentPlayerIndex: Int, pointsDifference: Int, alpha: Int, beta: Int, depth: Int): Int {
-        if (board.freeFields.isEmpty() || depth > MAX_DEPTH) {
+        if (board.freeFields.isEmpty() || depth > aiDepth) {
             return pointsDifference
         }
 

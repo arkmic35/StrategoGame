@@ -5,4 +5,6 @@
     <string name="pref_player1">Gracz 1</string>
     <string name="pref_player2">Gracz 2</string>
     <string name="game_currently">Teraz gra:\n%s</string>
+    <string name="pref_aidepth">Limit głębokości AI</string>
+    <string name="pref_defaultdepth">4</string>
 </resources>

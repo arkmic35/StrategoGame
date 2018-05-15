@@ -3,10 +3,6 @@ package game.model.player
 import game.model.Board
 
 class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, board: Board) {
-    companion object {
-        const val MAX_DEPTH = 4
-    }
-
     private val players = Array(players.size, { arrayIndex ->
         players[arrayIndex].clone()
     })
@@ -14,14 +10,16 @@ class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, bo
     private val board = Board(board, true)
 
     private var selectedField: Pair<Int, Int>? = null
+    private var aiDepth = 4
 
-    fun calculate(): Pair<Int, Int> {
+    fun calculate(aiDepth: Int): Pair<Int, Int> {
+        this.aiDepth = aiDepth
         recursive(board, myPlayerIndex, 0, 0)
         return selectedField!!
     }
 
     private fun recursive(board: Board, currentPlayerIndex: Int, pointsDifference: Int, depth: Int): Int {
-        if (board.freeFields.isEmpty() || depth > MAX_DEPTH) {
+        if (board.freeFields.isEmpty() || depth > aiDepth) {
             return pointsDifference
         }
 

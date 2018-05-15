@@ -8,6 +8,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 class CpuMinMaxPlayer(playerID: Int, playerName: String, color: Int) : CpuPlayer(playerID, playerName, color) {
+    var aiDepth = 4
+
     constructor(other: CpuMinMaxPlayer) : this(other.playerID, other.playerName, other.color) {
         points = other.points
     }
@@ -17,7 +19,7 @@ class CpuMinMaxPlayer(playerID: Int, playerName: String, color: Int) : CpuPlayer
 
         return Observable.create({ emitterOutside: Emitter<Void> ->
             val observable = Observable.create(ObservableOnSubscribe<Pair<Int, Int>> { emitter ->
-                emitter.onNext(processor.calculate())
+                emitter.onNext(processor.calculate(aiDepth))
                 emitter.onComplete()
             }).subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())

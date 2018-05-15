@@ -27,6 +27,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
     private var binding: ActivityGameBinding? = null
 
     private var playerTypes: Array<Int>? = null
+    private var aiDepth = 0
     private var tableFrame: GridLayout? = null
     private var players: Array<Player>? = null
 
@@ -49,6 +50,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
         playerTypes = Array(2, { playerNumber ->
             extras.getInt("PLAYER${playerNumber + 1}_TYPE")
         })
+        aiDepth = extras.getInt("AIDEPTH")
 
         prepareBoard()
     }
@@ -147,6 +149,14 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
                         4 -> CpuAlphaBetaPlayer(playerId, "AlfaBeta${playerSuffixes[playerId]}", colors[playerId])
                         else -> throw InvalidParameterException("Unknown type of player")
                     }
+
+            if (player is CpuMinMaxPlayer) {
+                player.aiDepth = aiDepth
+            }
+
+            if (player is CpuAlphaBetaPlayer) {
+                player.aiDepth = aiDepth
+            }
 
             player.messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->
                 if (message != null) {
