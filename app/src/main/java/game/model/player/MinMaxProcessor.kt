@@ -12,9 +12,14 @@ class MinMaxProcessor(players: Array<Player>, private val myPlayerIndex: Int, bo
     private var selectedField: Pair<Int, Int>? = null
     private var aiDepth = 4
 
-    fun calculate(aiDepth: Int): Pair<Int, Int> {
+    fun calculate(aiDepth: Int, toogleToGreedyTreshold: Int?): Pair<Int, Int> {
         this.aiDepth = aiDepth
-        recursive(board, myPlayerIndex, 0, 0)
+
+        if (toogleToGreedyTreshold != null && board.freeFields.size > toogleToGreedyTreshold) {
+            selectedField = board.findBestGreedyField()
+        } else {
+            recursive(board, myPlayerIndex, 0, 0)
+        }
         return selectedField!!
     }
 

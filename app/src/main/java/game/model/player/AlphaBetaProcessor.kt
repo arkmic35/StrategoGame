@@ -13,10 +13,18 @@ class AlphaBetaProcessor(players: Array<Player>, private val myPlayerIndex: Int,
 
     private var selectedField: Pair<Int, Int>? = null
     private var aiDepth = 4
+    private var shuffleFreeFieldsArray = false
 
-    fun calculate(aiDepth: Int): Pair<Int, Int> {
+    fun calculate(aiDepth: Int, toogleToGreedyTreshold: Int?, shuffleFreeFieldsArray: Boolean): Pair<Int, Int> {
         this.aiDepth = aiDepth
-        recursive(board, myPlayerIndex, 0, Int.MIN_VALUE, Int.MAX_VALUE, 0)
+        this.shuffleFreeFieldsArray = shuffleFreeFieldsArray
+
+        if (toogleToGreedyTreshold != null && board.freeFields.size > toogleToGreedyTreshold) {
+            selectedField = board.findBestGreedyField()
+        } else {
+            recursive(board, myPlayerIndex, 0, Int.MIN_VALUE, Int.MAX_VALUE, 0)
+        }
+
         return selectedField!!
     }
 
@@ -32,6 +40,10 @@ class AlphaBetaProcessor(players: Array<Player>, private val myPlayerIndex: Int,
                     currentPlayerIndex + 1
 
         val freeFieldsCopy = ArrayList(board.freeFields)
+        if (shuffleFreeFieldsArray) {
+            freeFieldsCopy.shuffle()
+        }
+
         var varAlpha = alpha
         var varBeta = beta
 

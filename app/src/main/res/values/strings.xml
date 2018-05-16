@@ -7,4 +7,6 @@
     <string name="game_currently">Teraz gra:\n%s</string>
     <string name="pref_aidepth">Limit głębokości AI</string>
     <string name="pref_defaultdepth">4</string>
+    <string name="pref_greedy_toggle">Próg przejścia na zachłanny</string>
+    <string name="pref_default_greedy_treshold">16</string>
 </resources>

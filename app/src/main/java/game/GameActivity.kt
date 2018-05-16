@@ -28,6 +28,7 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
     private var playerTypes: Array<Int>? = null
     private var aiDepth = 0
+    private var greedyTreshold = 0
     private var tableFrame: GridLayout? = null
     private var players: Array<Player>? = null
 
@@ -50,7 +51,8 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
         playerTypes = Array(2, { playerNumber ->
             extras.getInt("PLAYER${playerNumber + 1}_TYPE")
         })
-        aiDepth = extras.getInt("AIDEPTH")
+        aiDepth = extras.getInt("AI_DEPTH")
+        greedyTreshold = extras.getInt("GREEDY_TRESHOLD")
 
         prepareBoard()
     }
@@ -152,10 +154,12 @@ class GameActivity : AppCompatActivity(), GameOverDialog.GameOverDialogListener 
 
             if (player is CpuMinMaxPlayer) {
                 player.aiDepth = aiDepth
+                player.greedyTreshold = greedyTreshold
             }
 
             if (player is CpuAlphaBetaPlayer) {
                 player.aiDepth = aiDepth
+                player.greedyTreshold = greedyTreshold
             }
 
             player.messageLiveData.observe(this, android.arch.lifecycle.Observer { message ->

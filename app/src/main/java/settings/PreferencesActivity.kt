@@ -25,11 +25,13 @@ class PreferencesActivity : AppCompatActivity() {
         val player1Mode = findViewById<Spinner>(R.id.selectPlayer1).selectedItemPosition
         val player2Mode = findViewById<Spinner>(R.id.selectPlayer2).selectedItemPosition
         val aiDepth = findViewById<EditText>(R.id.editAIDepth).text.toString().toInt()
+        val greedyTreshold = findViewById<EditText>(R.id.editGreedyTreshold).text.toString().toInt()
 
         intent.putExtra("BOARD_SIZE", boardSize[0].toInt())
         intent.putExtra("PLAYER1_TYPE", player1Mode)
         intent.putExtra("PLAYER2_TYPE", player2Mode)
-        intent.putExtra("AIDEPTH", aiDepth)
+        intent.putExtra("AI_DEPTH", aiDepth)
+        intent.putExtra("GREEDY_TRESHOLD", greedyTreshold)
         startActivity(intent)
     }
 }
